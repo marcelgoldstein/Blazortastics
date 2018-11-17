@@ -1,0 +1,10 @@
+﻿@page "/JsInterop"
+@inherits JsInteropModel
+
+<h1>JavaScript interoperability</h1>
+
+<p>@this.MessageResult</p>
+
+<button class="btn btn-danger" onclick="@Alert">alert</button>
+<button class="btn btn-warning" onclick="@Confirm">confirm</button>
+<button class="btn btn-dark" onclick="@Prompt">prompt</button>

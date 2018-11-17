@@ -1,0 +1,269 @@
+﻿@page "/puzzle/"
+@page "/puzzle/n/{Playername}"
+@inherits PuzzleModel
+
+<h1 data-toggle="tooltip" title="via flexbox">15 Puzzle</h1>
+
+<div id="optionsContainer">
+    <form class="form-inline" onsubmit="return false;">
+        <ContextMenuTrigger MenuId="tableContextMenu">
+            <button id="btnNewGame" type="button" class="btn btn-primary customTooltip" onclick="@(() => ShuffleNewGameAsync(this.SelectedRasterSize))" data-tooltipContent="try out my contextmenu">
+                new game
+            </button>
+        </ContextMenuTrigger>
+
+        <select id="selectRasterSize" class="form-control-sm col-xs-1" bind="this.SelectedRasterSize">
+            @{
+                foreach (var size in new List<int>() { 3, 4, 5, 6, 7, 8, 9, 10 })
+                {
+                <option value="@size">@size</option>
+                }
+            }
+        </select>
+
+        <input id="playername" type="text" class="form-control-sm" col-xs-2 bind="this.Playername" placeholder="playername" onclick="this.select();" />
+
+        <button id="btnLeaderboard" type="button" class="btn btn-secondary form-control-sm" onclick="@(() => this.ShowLeaderboard(this.EffectiveRasterSize, this.Playername, this.EffectiveShuffleGrade))">
+            leaderboard
+        </button>
+    </form>
+</div>
+
+<div class="layoutContainer">
+    <div id="gameinfo">
+        <span>time: @ElapsedTimeString</span>
+        <span>moves: @MoveCount</span>
+    </div>
+
+    <div class="gameContainer">
+        @{
+            for (int number = 1; number <= this.RasterFieldsCount; number++)
+            {
+                int id = number; // ! needs to capture the value for later use in delegate in onclick
+                bool isLastItem = (number == this.RasterFieldsCount);
+
+            <div class="sizeHelperItem" style="order: @ItemPos[number-1]">
+                <div class="item @(isLastItem ? "blank" : "")" onclick="@(async () => await MoveAsync(id))">
+                    <span class="spanflex">
+                        <span class="spantext">@(isLastItem ? string.Empty : number.ToString())</span>
+                    </span>
+                </div>
+            </div>
+            }
+        }
+    </div>
+</div>
+
+@*das Kontextmemü unbedingt als letzes im VisualTree einhängen, damit es über den anderen Elementen dargestelt wird (ansonsten müsste man den z-Index manipulieren?)*@
+<ContextMenu Id="tableContextMenu">
+    @{
+        foreach (var step in new List<int>() { 3, 5, 7, 10, 20, 50, 100 })
+        {
+        <Item Click="@(async (e) => await ShuffleNewGameAsync(this.SelectedRasterSize, true, step))">
+            <span class="oi oi-layers" style="z-index: 999;"></span>
+            <span style="margin-left:5px;">@($"solvable in {@step} moves")</span>
+        </Item>
+        }
+    }
+</ContextMenu>
+
+<style>
+    /* abgetrennter Style, damit das Syntax-Highlighting des main-styles noch funktioniert*/
+
+    .gameContainer div.sizeHelperItem {
+        flex-basis: @((100M / this.EffectiveRasterSize).ToString().Replace(",", "."))%; /* das funktioniert tatsächlich; hat nur kein Syntax-Hightlighting mehr ;-)*/
+    }
+
+    .gameContainer div.item span.spantext {
+        font-size: calc(100vmin / 3 / @(this.EffectiveRasterSize));
+    }
+</style>
+
+<style>
+    .layoutContainer {
+        margin-top: 20px;
+        width: 100%;
+    }
+
+    @@media all and (max-height: 400px) {
+        .layoutContainer {
+            max-width: 170px;
+        }
+    }
+
+    @@media all and (min-height: 400px) {
+        .layoutContainer {
+            max-width: 170px;
+        }
+    }
+
+    @@media all and (min-height: 500px) {
+        .layoutContainer {
+            max-width: 270px;
+        }
+    }
+
+    @@media all and (min-height: 600px) {
+        .layoutContainer {
+            max-width: 370px;
+        }
+    }
+
+    @@media all and (min-height: 700px) {
+        .layoutContainer {
+            max-width: 470px;
+        }
+    }
+
+    @@media all and (min-height: 800px) {
+        .layoutContainer {
+            max-width: 570px;
+        }
+    }
+
+    @@media all and (min-height: 900px) {
+        .layoutContainer {
+            max-width: 670px;
+        }
+    }
+
+    @@media all and (min-height: 1000px) {
+        .layoutContainer {
+            max-width: 770px;
+        }
+    }
+
+    @@media all and (min-height: 1100px) {
+        .layoutContainer {
+            max-width: 870px;
+        }
+    }
+
+    @@media all and (min-height: 1200px) {
+        .layoutContainer {
+            max-width: 970px;
+        }
+    }
+
+    @@media all and (min-height: 1300px) {
+        .layoutContainer {
+            max-width: 1070px;
+        }
+    }
+
+    @@media all and (min-height: 1400px) {
+        .layoutContainer {
+            max-width: 1170px;
+        }
+    }
+
+    @@media all and (min-height: 1500px) {
+        .layoutContainer {
+            max-width: 1270px;
+        }
+    }
+
+    @@media all and (min-height: 1600px) {
+        .layoutContainer {
+            max-width: 1370px;
+        }
+    }
+
+    @@media all and (min-height: 1700px) {
+        .layoutContainer {
+            max-width: 1470px;
+        }
+    }
+
+    @@media all and (min-height: 1800px) {
+        .layoutContainer {
+            max-width: 1570px;
+        }
+    }
+
+    @@media all and (min-height: 1900px) {
+        .layoutContainer {
+            max-width: 1670px;
+        }
+    }
+
+    @@media all and (min-height: 2000px) {
+        .layoutContainer {
+            max-width: 1770px;
+        }
+    }
+
+    .gameContainer {
+        display: flex;
+        flex-flow: row wrap;
+        width: 100%;
+        padding: 0px;
+        margin: 0px;
+        background: chocolate;
+    }
+
+        .gameContainer div.item {
+            box-sizing: border-box;
+            border: 2px solid lightgray;
+            padding-top: 100%; /* 1:1 Aspect Ratio */
+            background-color: cornflowerblue;
+            transition: all 0.4s ease;
+            cursor: grab;
+            position: relative;
+        }
+
+            .gameContainer div.item:hover {
+                background-color: dodgerblue;
+                border: 2px solid gray;
+            }
+
+            .gameContainer div.item.blank {
+                background-color: transparent;
+                border: 2px solid lightgray;
+                cursor: auto;
+            }
+
+            .gameContainer div.item span.spanflex {
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .gameContainer div.item span.spantext {
+                -webkit-user-select: none; /* Chrome all / Safari all */
+                -moz-user-select: none; /* Firefox all */
+                -ms-user-select: none; /* IE 10+ */
+                user-select: none; /* Likely future */
+                color: white;
+                text-shadow: 20px;
+                text-shadow: -3px 1px 2px #494949;
+            }
+
+    #gameinfo {
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    #btnNewGame {
+        margin-right: 20px;
+    }
+
+    #selectRasterSize {
+        margin-right: 20px;
+    }
+
+    #playername {
+        margin-right: 20px;
+    }
+
+    #btnLeaderboard {
+        margin-right: 20px;
+    }
+</style>

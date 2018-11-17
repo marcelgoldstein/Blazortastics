@@ -1,6 +1,10 @@
-using Microsoft.AspNetCore.Blazor.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using Blazortastics.App.Services;
+using Blazortastics.App.Services.Puzzle;
+using Blazortastics.DB;
+using Microsoft.AspNetCore.Blazor.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Blazortastics.App
 {
@@ -8,14 +12,25 @@ namespace Blazortastics.App
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            // Since Blazor is running on the server, we can use an application service
-            // to read the forecast data.
             services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<PlacementCheckService>();
+            services.AddSingleton<MessageBoxService>();
+
+            var config = services.BuildServiceProvider().GetService<IConfigurationRoot>();
+
+            services.AddDbContext<BlazorDbContext>(o => o.UseSqlServer(config.GetConnectionString("BlazorDB")));
+
+            services.AddTransient<LeaderboardService>();
+
+            services.AddBlazorContextMenu();
         }
 
-        public void Configure(IBlazorApplicationBuilder app)
+        public void Configure(IBlazorApplicationBuilder app, BlazorDbContext db)
         {
             app.AddComponent<App>("app");
+
+            // ensure db is created and up to date
+            db.Database.Migrate();
         }
     }
 }

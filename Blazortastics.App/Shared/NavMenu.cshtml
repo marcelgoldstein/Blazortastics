@@ -22,14 +22,24 @@
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
             </NavLink>
         </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="JsInterop">
+                <span class="oi oi-project" aria-hidden="true"></span> JavaScript Interop
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="puzzle">
+                <span class="oi oi-puzzle-piece" aria-hidden="true"></span>15 Puzzle
+            </NavLink>
+        </li>
     </ul>
 </div>
 
 @functions {
-    bool collapseNavMenu = true;
+bool collapseNavMenu = true;
 
-    void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
+void ToggleNavMenu()
+{
+    collapseNavMenu = !collapseNavMenu;
+}
 }

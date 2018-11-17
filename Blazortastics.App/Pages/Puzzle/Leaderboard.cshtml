@@ -1,0 +1,105 @@
+﻿@page "/puzzle_Leaderboard"
+@page "/puzzle_Leaderboard/fs/{FieldSize}"
+@page "/puzzle_Leaderboard/fs/{FieldSize}/n/{Playername}"
+@page "/puzzle_Leaderboard/fs/{FieldSize}/s/{ShuffleGrade}"
+@page "/puzzle_Leaderboard/fs/{FieldSize}/n/{Playername}/s/{ShuffleGrade}"
+@inherits PuzzleLeaderboardModel
+
+@using System.Globalization;
+
+<h1>Leaderboard</h1>
+
+<form onsubmit="return false;">
+    <button id="btnBackToGame" type="button" class="btn btn-secondary form-control-sm" onclick="@(() => this.NavigateBackToGame())">back to game</button>
+    <br />
+    <br />
+    <input id="playername" type="text" class="form-control-sm" col-xs-2 bind="this.Playername" placeholder="playername" onclick="this.select();" />
+    <label for="selectedMonth" class="form-control-sm" col-xs-1>month</label>
+    <input id="selectedMonth" type="month" class="form-control-sm col-xs-1" bind="this.SelectedMonth" format-value="yyyy-MM" />
+
+    <label for="selectFieldSize" class="form-control-sm" col-xs-1>size</label>
+    <select id="selectFieldSize" class="form-control-sm col-xs-1" bind="this.SelectedFieldSize">
+        @{
+            foreach (var size in new List<int>() { 3, 4, 5, 6, 7, 8, 9, 10 })
+            {
+            <option value="@size">@size</option>
+            }
+        }
+    </select>
+
+    <label for="selectedShuffleGrade" class="form-control-sm" col-xs-1>mode</label>
+    <select id="selectedShuffleGrade" class="form-control-sm col-xs-1" bind="this.SelectedShuffleGrade">
+        @{
+            foreach (var size in new List<int>() { -1, 3, 5, 7, 10, 20, 50, 100 })
+            {
+            <option value="@size">@((size == -1 ? "normal" : size.ToString()))</option>
+            }
+        }
+    </select>
+
+    <button id="btnReload" type="button" class="btn btn-primary form-control-sm" onclick="@(() => this.RefreshRemoteAsync())">reload</button>
+</form>
+
+<table id="leaderboard" class="table table-sm table-striped table-hover">
+    <thead class="thead-light">
+        <tr>
+            <th>#</th>
+            <th>Time</th>
+            <th>Playername</th>
+            <th>Moves</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ranking in this.DisplayedRankings)
+        {
+        <tr data-playername="@ranking.Name">
+            <td nowrap>@ranking.Position</td>
+            <td nowrap>@ranking.FormattedTime</td>
+            <td nowrap>@ranking.Name</td>
+            <td nowrap>@ranking.Moves</td>
+            <td nowrap>@ranking.Timestamp.ToString("f", new CultureInfo("de-DE"))</td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<style>
+    tr[data-playername="@this.Playername"] {
+        color: rgb(249, 148, 2);
+    }
+</style>
+
+<style>
+    #btnBackToGame {
+        margin-right: 30px;
+    }
+
+    #selectFieldSize {
+        margin-right: 20px;
+    }
+
+    #playername {
+        margin-right: 20px;
+    }
+
+    #selectedShuffleGrade {
+        margin-right: 20px;
+    }
+
+    #leaderboard {
+        margin-top: 20px;
+    }
+
+    #selectedMonth {
+        margin-right: 20px;
+    }
+
+    #btnReload {
+        margin-right: 20px;
+    }
+
+    td:first-child {
+        font-weight: bold;
+    }
+</style>
